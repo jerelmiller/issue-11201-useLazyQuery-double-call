@@ -7,7 +7,7 @@ import {
   ApolloProvider,
   InMemoryCache,
   gql,
-  useLazyQuery
+  useLazyQuery,
 } from "@apollo/client";
 import { GraphQLID } from "graphql";
 
@@ -32,19 +32,20 @@ function App() {
   const [getData] = useLazyQuery(ALL_PEOPLE, {
     onCompleted(data) {
       console.log("COMPLETED QUERY: ", ++counterQuery);
-    }
+    },
   });
 
   useEffect(() => {
     console.log("USE FUNCTION: ", ++counterFn);
     getData({
       variables: {
-        id: 1
-      }
+        id: 1,
+        name: "name",
+      },
     });
     setTimeout(() => {
       console.log("USE FUNCTION: ", ++counterFn);
-      getData();
+      getData({ variables: { id: 2 } });
     }, 3000);
   }, [getData]);
 
@@ -53,7 +54,7 @@ function App() {
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link
+  link,
 });
 
 const container = document.getElementById("root");
@@ -69,5 +70,5 @@ root.render(
         </Route>
       </Routes>
     </Router>
-  </ApolloProvider>
+  </ApolloProvider>,
 );

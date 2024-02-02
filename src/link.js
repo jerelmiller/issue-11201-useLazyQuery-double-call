@@ -33,7 +33,7 @@ const url = "wss://uifesi.sse.codesandbox.io/graphql";
 const wsLink = new GraphQLWsLink(
   createClient({
     url,
-  })
+  }),
 );
 
 const definitionIsSubscription = (d) => {
@@ -44,8 +44,14 @@ const definitionIsSubscription = (d) => {
 // based on operation type: a WebSocket for subscriptions and our own
 // custom ApolloLink for everything else.
 // For more information, see: https://www.apollographql.com/docs/react/api/link/introduction/#directional-composition
-export const link = ApolloLink.split(
-  (operation) => operation.query.definitions.some(definitionIsSubscription),
-  wsLink,
-  staticDataLink
-);
+export const link = ApolloLink.from([
+  new ApolloLink((operation, forward) => {
+    console.log("request", {
+      query: print(operation.query),
+      variables: operation.variables,
+    });
+
+    return forward(operation);
+  }),
+  staticDataLink,
+]);
